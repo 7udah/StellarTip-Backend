@@ -1,22 +1,26 @@
-import { ActivityLog } from '../entities/activity-log.entity';
+import { Tip } from './tip.entity';
 export declare enum AuthMethod {
     EMAIL = "email",
-    STARKNET = "starknet",
-    export,
-    enum,
-    UserRole
+    STELLAR = "stellar"
+}
+export declare enum UserRole {
+    USER = "user",
+    ADMIN = "admin"
 }
 export declare class User {
     id: string;
+    username: string;
+    displayName: string;
+    bio: string;
+    avatarUrl: string;
     email: string;
     password: string;
-    firstName: string;
-    lastName: string;
-    isActive: boolean;
-    starknetAddress: string;
+    walletAddress: string;
     authMethod: AuthMethod;
     role: UserRole;
-    activityLogs: ActivityLog[];
+    isActive: boolean;
+    receivedTips: Tip[];
+    sentTips: Tip[];
     createdAt: Date;
     updatedAt: Date;
     validateAuthMethod(): void;

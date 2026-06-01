@@ -8,44 +8,42 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = exports.AuthMethod = void 0;
+exports.User = exports.UserRole = exports.AuthMethod = void 0;
 const typeorm_1 = require("typeorm");
-const activity_log_entity_1 = require("../entities/activity-log.entity");
+const tip_entity_1 = require("./tip.entity");
 var AuthMethod;
 (function (AuthMethod) {
     AuthMethod["EMAIL"] = "email";
-    AuthMethod["STARKNET"] = "starknet";
-    AuthMethod[AuthMethod["export"] = void 0] = "export";
-    AuthMethod[AuthMethod["enum"] = void 0] = "enum";
-    AuthMethod[AuthMethod["UserRole"] = void 0] = "UserRole";
+    AuthMethod["STELLAR"] = "stellar";
 })(AuthMethod || (exports.AuthMethod = AuthMethod = {}));
-{
-    USER = 'user',
-        ADMIN = 'admin',
-        MODERATOR = 'moderator',
-    ;
-}
+var UserRole;
+(function (UserRole) {
+    UserRole["USER"] = "user";
+    UserRole["ADMIN"] = "admin";
+})(UserRole || (exports.UserRole = UserRole = {}));
 let User = class User {
     id;
+    username;
+    displayName;
+    bio;
+    avatarUrl;
     email;
     password;
-    firstName;
-    lastName;
-    isActive;
-    starknetAddress;
+    walletAddress;
     authMethod;
     role;
-    activityLogs;
+    isActive;
+    receivedTips;
+    sentTips;
     createdAt;
     updatedAt;
     validateAuthMethod() {
         if (this.authMethod === AuthMethod.EMAIL && !this.email) {
             throw new Error('Email is required for email authentication');
         }
-        if (this.authMethod === AuthMethod.STARKNET && !this.starknetAddress) {
-            throw new Error('StarkNet address is required for StarkNet authentication');
+        if (this.authMethod === AuthMethod.STELLAR && !this.walletAddress) {
+            throw new Error('Wallet address is required for Stellar authentication');
         }
     }
 };
@@ -55,36 +53,40 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "id", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ unique: true }),
+    __metadata("design:type", String)
+], User.prototype, "username", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "displayName", void 0);
+__decorate([
+    (0, typeorm_1.Column)('text', { nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "bio", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], User.prototype, "avatarUrl", void 0);
+__decorate([
     (0, typeorm_1.Column)({ unique: true, nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ nullable: true, select: false }),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], User.prototype, "firstName", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", String)
-], User.prototype, "lastName", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ default: true }),
-    __metadata("design:type", Boolean)
-], User.prototype, "isActive", void 0);
-__decorate([
     (0, typeorm_1.Column)({ unique: true, nullable: true }),
     __metadata("design:type", String)
-], User.prototype, "starknetAddress", void 0);
+], User.prototype, "walletAddress", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',
         enum: AuthMethod,
-        default: AuthMethod.EMAIL
+        default: AuthMethod.EMAIL,
     }),
-    __metadata("design:type", Object)
+    __metadata("design:type", String)
 ], User.prototype, "authMethod", void 0);
 __decorate([
     (0, typeorm_1.Column)({
@@ -92,12 +94,20 @@ __decorate([
         enum: UserRole,
         default: UserRole.USER,
     }),
-    __metadata("design:type", typeof (_a = typeof UserRole !== "undefined" && UserRole) === "function" ? _a : Object)
+    __metadata("design:type", String)
 ], User.prototype, "role", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => activity_log_entity_1.ActivityLog, (activityLog) => activityLog.user),
+    (0, typeorm_1.Column)({ default: true }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isActive", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => tip_entity_1.Tip, (tip) => tip.creator),
     __metadata("design:type", Array)
-], User.prototype, "activityLogs", void 0);
+], User.prototype, "receivedTips", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => tip_entity_1.Tip, (tip) => tip.supporter),
+    __metadata("design:type", Array)
+], User.prototype, "sentTips", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)

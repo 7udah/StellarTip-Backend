@@ -13,11 +13,10 @@ const typeorm_1 = require("@nestjs/typeorm");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const typeorm_config_1 = require("./config/typeorm.config");
-const blog_module_1 = require("./blog/blog.module");
-const book_module_1 = require("./entities/book.module");
-const reading_progress_module_1 = require("./reading-progress/reading-progress.module");
 const auth_module_1 = require("./auth/auth.module");
-const starknet_module_1 = require("./starknet/starknet.module");
+const tips_module_1 = require("./tips/tips.module");
+const profiles_module_1 = require("./profiles/profiles.module");
+const stellar_module_1 = require("./stellar/stellar.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -29,11 +28,10 @@ exports.AppModule = AppModule = __decorate([
                 envFilePath: '.env',
             }),
             typeorm_1.TypeOrmModule.forRoot(typeorm_config_1.default),
-            blog_module_1.BlogModule,
-            reading_progress_module_1.ReadingProgressModule,
             auth_module_1.AuthModule,
-            starknet_module_1.StarknetModule,
-            book_module_1.BookModule,
+            tips_module_1.TipsModule,
+            profiles_module_1.ProfilesModule,
+            stellar_module_1.StellarModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

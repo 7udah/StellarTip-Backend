@@ -1,8 +1,9 @@
-// Export all auth module components
 export * from './auth.module';
 export * from './auth.service';
 export * from './auth.controller';
 export * from './guards/jwt-auth.guard';
 export * from './strategies/jwt.strategy';
-export * from './strategies/starknet.strategy';
-export * from './dto/login-starknet.dto';
+export * from './strategies/stellar.strategy';
+export * from './dto/login-stellar.dto';
+export * from './dto/login.dto';
+export * from './dto/signup.dto';

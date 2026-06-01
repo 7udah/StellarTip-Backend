@@ -8,18 +8,16 @@ import {
   BeforeInsert,
   BeforeUpdate,
 } from 'typeorm';
-import { ActivityLog } from '../entities/activity-log.entity';
-
+import { Tip } from './tip.entity';
 
 export enum AuthMethod {
   EMAIL = 'email',
-  STARKNET = 'starknet',
+  STELLAR = 'stellar',
+}
 
 export enum UserRole {
   USER = 'user',
   ADMIN = 'admin',
-  MODERATOR = 'moderator',
-
 }
 
 @Entity('users')
@@ -27,31 +25,34 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ unique: true })
+  username: string;
+
+  @Column({ nullable: true })
+  displayName: string;
+
+  @Column('text', { nullable: true })
+  bio: string;
+
+  @Column({ nullable: true })
+  avatarUrl: string;
+
   @Column({ unique: true, nullable: true })
   email: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: false })
   password: string;
 
-  @Column({ nullable: true })
-  firstName: string;
-
-  @Column({ nullable: true })
-  lastName: string;
-
-  @Column({ default: true })
-  isActive: boolean;
-
-
   @Column({ unique: true, nullable: true })
-  starknetAddress: string;
+  walletAddress: string;
 
   @Column({
     type: 'enum',
     enum: AuthMethod,
-    default: AuthMethod.EMAIL
+    default: AuthMethod.EMAIL,
   })
   authMethod: AuthMethod;
+
   @Column({
     type: 'enum',
     enum: UserRole,
@@ -59,9 +60,14 @@ export class User {
   })
   role: UserRole;
 
+  @Column({ default: true })
+  isActive: boolean;
 
-  @OneToMany(() => ActivityLog, (activityLog) => activityLog.user)
-  activityLogs: ActivityLog[];
+  @OneToMany(() => Tip, (tip) => tip.creator)
+  receivedTips: Tip[];
+
+  @OneToMany(() => Tip, (tip) => tip.supporter)
+  sentTips: Tip[];
 
   @CreateDateColumn()
   createdAt: Date;
@@ -75,9 +81,9 @@ export class User {
     if (this.authMethod === AuthMethod.EMAIL && !this.email) {
       throw new Error('Email is required for email authentication');
     }
-    
-    if (this.authMethod === AuthMethod.STARKNET && !this.starknetAddress) {
-      throw new Error('StarkNet address is required for StarkNet authentication');
+
+    if (this.authMethod === AuthMethod.STELLAR && !this.walletAddress) {
+      throw new Error('Wallet address is required for Stellar authentication');
     }
   }
 }

@@ -1,53 +1,60 @@
-
-import { Controller, Post, Body, Get, Query, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Query,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginStarknetDto } from './dto/login-starknet.dto';
-import { StarknetStrategy } from './strategies/starknet.strategy';
+import { SignupDto } from './dto/signup.dto';
+import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-
-import { Body, Controller, Post } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { UserRole } from '../entities/user.entity'
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('starknet/login')
-  async loginStarknet(@Body() loginDto: LoginStarknetDto) {
-    const user = await this.authService.validateStarknetUser(loginDto.address);
+  @Post('stellar/login')
+  async loginStellar(@Body('walletAddress') walletAddress: string) {
+    if (!walletAddress || typeof walletAddress !== 'string') {
+      throw new Error('walletAddress is required');
+    }
+    const normalized = walletAddress.trim();
+    if (!normalized.startsWith('G') || normalized.length < 56) {
+      throw new Error('Invalid Stellar wallet address format');
+    }
+    const user = await this.authService.validateStellarUser(normalized);
     return this.authService.login(user);
   }
 
   @Get('nonce')
-  async getNonce(@Query('address') address: string) {
-    if (!address) {
-      throw new Error('Address is required');
+  async getNonce(@Query('walletAddress') walletAddress: string) {
+    if (!walletAddress) {
+      throw new Error('walletAddress is required');
     }
-    return this.authService.getNonce(address);
+    return this.authService.getNonce(walletAddress);
+  }
+
+  @Post('signup')
+  async signup(@Body() signupDto: SignupDto) {
+    return this.authService.signup(
+      signupDto.email,
+      signupDto.password,
+      signupDto.username,
+      signupDto.displayName,
+    );
+  }
+
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.loginWithEmail(loginDto.email, loginDto.password);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
-
-  @Post('signup')
-  async signup(
-    @Body('email') email: string,
-    @Body('password') password: string,
-    @Body('firstName') firstName: string,
-    @Body('lastName') lastName: string,
-    @Body('role') role?: UserRole,
-  ) {
-    return this.authService.signup(email, password, firstName, lastName, role);
-  }
-
-  @Post('login')
-  async login(
-    @Body('email') email: string,
-    @Body('password') password: string,
-  ) {
-    return this.authService.login(email, password)
   }
 }
