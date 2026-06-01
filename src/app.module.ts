@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { TipsModule } from './tips/tips.module';
 import { ProfilesModule } from './profiles/profiles.module';
 import { StellarModule } from './stellar/stellar.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { StellarModule } from './stellar/stellar.module';
     TipsModule,
     ProfilesModule,
     StellarModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [
